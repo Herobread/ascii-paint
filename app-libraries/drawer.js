@@ -128,9 +128,41 @@ export const drawer = {
 
         return this.cropImg(left, top, right + 1, bottom + 1)
     },
+    getDrawingSize: function () {
+        let left = 999
+        let right = 0
+        let top = 999
+        let bottom = 0
+
+        for (let y = 1; y < this.height; y += 1) {
+            for (let x = 0; x < this.width; x += 1) {
+                if (this.image[y][x] !== ' ') {
+                    left = Math.min(left, x)
+                    right = Math.max(right, x)
+                    top = Math.min(top, y)
+                    bottom = Math.max(bottom, y)
+                }
+            }
+        }
+
+        return {
+            width: right - left,
+            height: bottom - top
+        }
+    },
+    getJSONDrawing: function () {
+        const drawingSizes = this.getDrawingSize()
+
+        let object = `name: {
+    img: ${this.getDrawing()},
+    width: drawingSizes.width,
+    height: drawingSizes.height
+}`
+
+        return object
+    },
     cropImg: function (startX, startY, endX, endY) {
         let res = ''
-
 
         for (let y = startY; y < endY; y += 1) {
             for (let x = startX; x < endX; x += 1) {

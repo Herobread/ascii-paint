@@ -102,6 +102,7 @@ export function mainMenu() {
         {
             content: `Export to JSON`,
             onClick: () => {
+                navigator.clipboard.writeText(drawer.getJSONDrawing())
 
                 showInfo('Saved JSON to clipboard.', 2000)
                 drawCooldown = 200
