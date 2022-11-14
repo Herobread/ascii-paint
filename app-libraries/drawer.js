@@ -146,8 +146,3 @@ export const drawer = {
         return res
     }
 }
-
-/*
-
-
-*/
