@@ -3,7 +3,7 @@ import { test } from "./pages/test.js"
 import { animationViewer, initAnimationViewer } from "./utilityPages/viewAnimations.js"
 import { assetsViewer, initAssetsViewer } from "./utilityPages/viewAssets.js"
 
-const fps = 1
+const fps = 144
 
 export const pages = [
     {

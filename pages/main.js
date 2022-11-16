@@ -11,26 +11,25 @@ import { ui } from '../lib/ui.js'
 import { randomInRange, randomInRangeFloat } from '../lib/util.js'
 
 let symbol = '#'
-let painting = drawer.init(300, 300, 0, 0)
-let info = ''
-let infoCooldown = 0
-let drawCooldown = 0
-
-// let isReplaceSelect = false
-
-let latestPos = null
 let mode = 'paint'
 
-let IsUIActive = false
+let painting = drawer.init(300, 300, 0, 0)
+
+let info = ''
+let infoCooldown = 0
+
+let latestPos = null
+
+let IsUIActive = false // prevents drawing if clicking on any ui buttons
 let isCoordsShown = false
+let isKeyboardMode = false
 
-// function resizer() {
-//     const width = window.w
-//     const height = window.h
-//     painting = drawer.init(width, height, 0, 0)
-// }
+let pointerX = 20
+let pointerY = 20
+let pointerBlinkCooldown = 200
+const MAX_POINTER_BLINK_COOLDOWN = 200
 
-let dropDown
+let dropDown = {}
 
 const onClose = () => {
     IsUIActive = false
@@ -47,13 +46,42 @@ function showInfo(info_, cooldown = -1) {
 
 export function initMain() {
     painting = drawer.init(300, 300, 0, 0)
-
-    // window.addEventListener('resize', resizer)
 }
 
 export function mainMenu() {
     const pointer = mouse.info()
     const keyboard = kb.info()
+
+    if (isKeyboardMode) {
+        const isPointerInPainting = pointer.y > 1 && pointer.y < window.h
+        if (pointer.click && isPointerInPainting) {
+            pointerX = pointer.x
+            pointerY = pointer.y
+        }
+        if (keyboard.new['ArrowUp']) {
+            pointerY -= 1
+
+            pointerBlinkCooldown = MAX_POINTER_BLINK_COOLDOWN
+        }
+        if (keyboard.new['ArrowDown']) {
+            pointerY += 1
+
+            pointerBlinkCooldown = MAX_POINTER_BLINK_COOLDOWN
+        }
+        if (keyboard.new['ArrowLeft']) {
+            pointerX -= 1
+
+            pointerBlinkCooldown = MAX_POINTER_BLINK_COOLDOWN
+        }
+        if (keyboard.new['ArrowRight']) {
+            pointerX += 1
+
+            pointerBlinkCooldown = MAX_POINTER_BLINK_COOLDOWN
+        }
+    } else {
+        pointerX = pointer.x
+        pointerY = pointer.y
+    }
 
     drawer.display()
 
@@ -61,6 +89,10 @@ export function mainMenu() {
 
     if (infoCooldown > 0) {
         infoCooldown -= 1
+    }
+    pointerBlinkCooldown -= 1
+    if (pointerBlinkCooldown < 0) {
+        pointerBlinkCooldown = MAX_POINTER_BLINK_COOLDOWN
     }
 
     let latestPressedKey = Object.entries(keyboard.new)[0]
@@ -73,7 +105,7 @@ export function mainMenu() {
             content: `Replace ${symbol}`,
             pointer: pointer,
             onClick: () => {
-                showInfo(`Replace ${symbol} to <select key by pressing it> or Ctrl + q to cancel.`)
+                showInfo(`Replace ${symbol} to <select key by pressing it>.`) // or Ctrl + q to cancel (todo)
 
                 mode = 'replace'
             }
@@ -116,16 +148,25 @@ export function mainMenu() {
             content: isCoordsShown ? `Hide coordinates` : `Show coordinates`,
             pointer: pointer,
             onClick: () => {
-                // showInfo(`somethin happend`, 500)
                 isCoordsShown = !isCoordsShown
+                if (isCoordsShown) {
+                    showInfo(`Coordinates are shown`, 500)
+                } else {
+                    showInfo(`Coordinates are hidden`, 500)
+                }
             }
         },
         {
-            content: 'Keyboard mode(not done)',
+            content: isKeyboardMode ? 'Mouse mode' : 'Keyboard mode',
             pointer: pointer,
             onClick: () => {
-                showInfo(`somethin will happen`, 500)
-                // isCoordsShown = !isCoordsShown
+                isKeyboardMode = !isKeyboardMode
+
+                if (isKeyboardMode) {
+                    showInfo(`Keyboard mode is on`, 500)
+                } else {
+                    showInfo(`Keyboard mode is off`, 500)
+                }
             }
         }
     ]
@@ -135,19 +176,25 @@ export function mainMenu() {
     dropDownX += dropDown.width + 1
     dropDown = ui.dropDown('Transform', transformOptions, dropDownX, 0, pointer, onOpen, onClose)
     dropDownX += dropDown.width + 1
-    dropDown = ui.dropDown('Cursor', cursorOptions, dropDownX, 0, pointer, onOpen, onClose)
+    let cursorDropwdownName = isKeyboardMode ? 'Cursor(KB)' : 'Cursor(M)'
+    dropDown = ui.dropDown(cursorDropwdownName, cursorOptions, dropDownX, 0, pointer, onOpen, onClose)
 
 
     if (mode === 'paint' && !IsUIActive) {
-        if (pointer.down && pointer.y < window.h - 2) {
-            drawer.putSymbol(symbol, pointer.x, pointer.y)
+        const isNotInInfoPanel = pointerY < window.h - 1
+        const isNotInToolsPanel = pointerY > 0
+        // if not in kb mode: get pointer.down event
+        // else if in kb mode: if enter pressed
+        const isValidClick = ((pointer.down && !isKeyboardMode) || keyboard.down['Enter'])
+        if (isValidClick && isNotInToolsPanel && isNotInInfoPanel) {
+            drawer.putSymbol(symbol, pointerX, pointerY)
 
             if (latestPos)
-                drawer.line(symbol, latestPos.x, latestPos.y, pointer.x, pointer.y)
+                drawer.line(symbol, latestPos.x, latestPos.y, pointerX, pointerY)
 
             latestPos = {
-                x: pointer.x,
-                y: pointer.y
+                x: pointerX,
+                y: pointerY
             }
         } else {
             latestPos = null
@@ -167,15 +214,20 @@ export function mainMenu() {
     animations.render()
 
 
-    if (latestPressedKey)
+    if (latestPressedKey && latestPressedKey.length == 1) {
         symbol = latestPressedKey
+
+        if (isKeyboardMode) {
+            drawer.putSymbol(symbol, pointerX, pointerY)
+        }
+    }
 
     let cursor = symbol
     if (cursor === ' ')
         cursor = '-'
 
     if (isCoordsShown)
-        cursor += ` x:${pointer.x}\n  y:${pointer.y}`
+        cursor += ` x:${pointerX}\n  y:${pointerY}`
 
     if (infoCooldown != 0) {
         renderer.drawObject(`${info} `, 2, window.h - 2)
@@ -196,7 +248,13 @@ export function mainMenu() {
 
     // renderer.drawObject(`[debug info] Mode:${mode}, isUIActive:${IsUIActive}`, 0, window.h - 3)
 
-    mouse.showCursor(cursor)
+    if (isKeyboardMode) {
+        if (pointerBlinkCooldown > 75)
+            renderer.drawObject(cursor, pointerX, pointerY)
+        mouse.showCursor('+')
+    } else {
+        mouse.showCursor(cursor)
+    }
 }
 
 /*

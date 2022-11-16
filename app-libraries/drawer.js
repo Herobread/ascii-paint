@@ -154,9 +154,9 @@ export const drawer = {
         const drawingSizes = this.getDrawingSize()
 
         let object = `name: {
-    img: ${this.getDrawing()},
-    width: drawingSizes.width,
-    height: drawingSizes.height
+    img: \`${this.getDrawing()}\`,
+    width: ${drawingSizes.width},
+    height: ${drawingSizes.height}
 }`
 
         return object

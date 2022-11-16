@@ -21,6 +21,7 @@ const startPageId = 0
 window.currentPageFunction = pages[startPageId].func
 pages[startPageId].init()
 window.fps = pages[startPageId].fps
+// window.fps = 40
 window.clock = 0
 
 let interval
@@ -42,7 +43,7 @@ window.onload = function () {
     mouse.init()
     kb.init()
 
-    interval = setInterval(main, 1000 / 1000)
+    interval = setInterval(main, 1000 / 144)
 }
 
 
@@ -66,9 +67,6 @@ function main() {
 
         window.currentPageFunction()
         logger.log('logic', performance.now() - s)
-
-        // if (window.clock % 200 === 1) {
-        // }
     } else {
         pages.forEach(page => {
             if (page.name === window.page) {
