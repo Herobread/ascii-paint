@@ -176,5 +176,30 @@ export const drawer = {
         }
 
         return res
+    },
+    putObject(object, x, y) {
+        if (!object) {
+            throw 'Object to draw is not defined'
+        }
+        if (x == undefined) {
+            throw `X is not defined(${object})`
+        }
+        if (y == undefined) {
+            throw `Y is not defined(${object})`
+        }
+
+        let _y = 0;
+        let _x = 0;
+        x = parseInt(x)
+        y = parseInt(y)
+        for (let i = 0; i < object.length; i++) {
+            if (object.charAt(i) !== '\n') {
+                this.putSymbol(object.charAt(i), x + _x, y + _y)
+                _x++
+            } else {
+                _x = 0
+                _y++
+            }
+        }
     }
 }
