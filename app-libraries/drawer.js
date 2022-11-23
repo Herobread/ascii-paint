@@ -21,6 +21,9 @@ export const drawer = {
             }
         }
     },
+    getSymbol: function (x, y) {
+        return this.image[y][x]
+    },
     putSymbol: function (symbol, x, y) {
         const realX = x - this.x
         const realY = y - this.y

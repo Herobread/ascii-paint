@@ -156,7 +156,8 @@ export function mainMenu() {
 			onClick: () => {
 				navigator.clipboard.readText()
 					.then(data => {
-						object = data.replaceAll('\t', '  ')
+						console.log(data)
+						object = data.replaceAll('\t', '  ').replaceAll('\r', '')
 
 						if (!object) {
 							showInfo('Clipboard is empty', -1)
@@ -291,6 +292,8 @@ export function mainMenu() {
 	}
 
 	// renderer.drawObject(`[debug info] Mode:${mode}, isUIActive:${IsUIActive}`, 0, window.h - 3)
+
+	// cursor += `  ${drawer.getSymbol(pointerX, pointerY).charCodeAt(0)}  `
 
 	if (isKeyboardMode) {
 		if (pointerBlinkCooldown > 75)
