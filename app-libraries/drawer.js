@@ -49,6 +49,31 @@ export const drawer = {
             }
         }
     },
+    toTransperency: function () {
+        const symbol = ':'
+
+        for (let y = 0; y < this.height; y += 1) {
+            let start = 0
+            let end = 0
+            let isEmpty = true
+
+            for (let x = 0; x < this.width; x += 1) {
+                if (this.image[y][x] !== ' ') {
+                    this.image[y][x] = symbol
+
+                    if (!start) {
+                        start = x
+                        isEmpty = false
+                    }
+
+                    end = x
+                }
+            }
+
+            if (!isEmpty)
+                this.line(symbol, start, y, end, y)
+        }
+    },
     line: function (symbol, x1, y1, x2, y2) {
         // https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 

@@ -116,6 +116,14 @@ export function mainMenu() {
 					mode = 'paint'
 				}
 			}
+		},
+		{
+			content: 'To transperency map',
+			pointer: pointer,
+			onClick: () => {
+				drawer.toTransperency()
+				showInfo(`Converted successfully.`, 500)
+			}
 		}
 	]
 
