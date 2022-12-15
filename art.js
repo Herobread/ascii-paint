@@ -34,21 +34,6 @@ export const art = {
       width: 27,
       height: 15
     },
-    asteroid2: {
-      img: `     ################## 
-   ##                 ##
- ##                    #
-##                     #
-#                     ##
-#                     # 
-#                    ## 
-##                  ##  
- #######       ######   
-       #########        
-`,
-      width: 23,
-      height: 9
-    }
   },
   animations: {
     particle: {

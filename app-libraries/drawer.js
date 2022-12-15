@@ -157,9 +157,9 @@ export const drawer = {
         return this.cropImg(left, top, right + 1, bottom + 1)
     },
     getDrawingSize: function () {
-        let left = 999
+        let left = 9999
         let right = 0
-        let top = 999
+        let top = 9999
         let bottom = 0
 
         for (let y = 1; y < this.height; y += 1) {
@@ -174,20 +174,27 @@ export const drawer = {
         }
 
         return {
-            width: right - left,
-            height: bottom - top
+            width: right - left + 1,
+            height: bottom - top + 1
         }
     },
     getJSONDrawing: function () {
         const drawingSizes = this.getDrawingSize()
 
+
+
         let object = `name: {
     img: \`${this.getDrawing()}\`,
-    width: ${drawingSizes.width},
-    height: ${drawingSizes.height}
+    w: ${drawingSizes.width + 1},
+    h: ${drawingSizes.height + 1}
 }`
 
         return object
+    },
+    getTM: function () {
+        // this.toTransperency()
+
+        return `tm: \`${this.getDrawing()}\``
     },
     cropImg: function (startX, startY, endX, endY) {
         let res = ''

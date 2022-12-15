@@ -103,7 +103,7 @@ export function mainMenu() {
 
 	const transformOptions = [
 		{
-			content: mode === 'replace' ? `Cancel replace` : `Replace ${symbol}`,
+			content: mode === 'replace' ? `Cancel replace` : `Replace '${symbol}'`,
 			pointer: pointer,
 			onClick: () => {
 				showInfo(`Replace ${symbol} to <select key by pressing it>.`)
@@ -152,6 +152,15 @@ export function mainMenu() {
 				navigator.clipboard.writeText(drawer.getJSONDrawing())
 
 				showInfo('Saved JSON to clipboard.', 2000)
+				// drawCooldown = 200
+			}
+		},
+		{
+			content: `Export as tm`,
+			onClick: () => {
+				navigator.clipboard.writeText(drawer.getTM())
+
+				showInfo('Exported as transperency map to clipboard.', 2000)
 				// drawCooldown = 200
 			}
 		},
