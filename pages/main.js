@@ -54,6 +54,31 @@ function copyObject() {
 
 }
 
+function loadFromClipboard(){
+
+		navigator.clipboard.readText()
+			.then(data => {
+				console.log(data)
+				object = data.replaceAll('\t', '  ').replaceAll('\r', '')
+
+				if (!object) {
+					showInfo('Clipboard is empty', -1)
+				} else {
+					showInfo('Select a place to paste clipboard.', -1)
+
+					mode = 'paste once'
+				}
+			})
+			.catch(error => {
+				showInfo(`${error}`, -1)
+
+				showInfo('Failed to load object from clipboard.', -1)
+			})
+
+		// drawCooldown = 200
+	
+}
+
 export function initMain() {
 	painting = drawer.init(300, 300, 0, 0)
 }
@@ -67,7 +92,10 @@ export function mainMenu() {
 		copyObject()
 		return
 	}
-
+	if (keyboard.new['v']?.ctrl) {
+		loadFromClipboard()
+		return
+	}
 	// Handle CTRL+C functionality
 	if (keyboard.new['c']?.ctrl) {
 		// CTRL+C pressed, copy content to clipboard
@@ -188,28 +216,7 @@ export function mainMenu() {
 		},
 		{
 			content: `Load from clipboard`,
-			onClick: () => {
-				navigator.clipboard.readText()
-					.then(data => {
-						console.log(data)
-						object = data.replaceAll('\t', '  ').replaceAll('\r', '')
-
-						if (!object) {
-							showInfo('Clipboard is empty', -1)
-						} else {
-							showInfo('Select a place to paste clipboard.', -1)
-
-							mode = 'paste once'
-						}
-					})
-					.catch(error => {
-						showInfo(`${error}`, -1)
-
-						showInfo('Failed to load object from clipboard.', -1)
-					})
-
-				// drawCooldown = 200
-			}
+			onClick: loadFromClipboard
 		},
 	]
 
