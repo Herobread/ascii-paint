@@ -45,6 +45,40 @@ function showInfo(info_, cooldown = -1) {
 	infoCooldown = cooldown
 }
 
+function copyObject() {
+	navigator.clipboard.writeText(drawer.getDrawing())
+
+	// drawCooldown = 200
+
+	showInfo('Saved object to clipboard.', 2000)
+
+}
+
+function loadFromClipboard(){
+
+		navigator.clipboard.readText()
+			.then(data => {
+				console.log(data)
+				object = data.replaceAll('\t', '  ').replaceAll('\r', '')
+
+				if (!object) {
+					showInfo('Clipboard is empty', -1)
+				} else {
+					showInfo('Select a place to paste clipboard.', -1)
+
+					mode = 'paste once'
+				}
+			})
+			.catch(error => {
+				showInfo(`${error}`, -1)
+
+				showInfo('Failed to load object from clipboard.', -1)
+			})
+
+		// drawCooldown = 200
+	
+}
+
 export function initMain() {
 	painting = drawer.init(300, 300, 0, 0)
 }
@@ -52,6 +86,24 @@ export function initMain() {
 export function mainMenu() {
 	const pointer = mouse.info()
 	const keyboard = kb.info()
+
+	// Check if CTRL key is pressed
+	if (keyboard.new['c']?.ctrl) {
+		copyObject()
+		return
+	}
+	if (keyboard.new['v']?.ctrl) {
+		loadFromClipboard()
+		return
+	}
+	// Handle CTRL+C functionality
+	if (keyboard.new['c']?.ctrl) {
+		// CTRL+C pressed, copy content to clipboard
+		navigator.clipboard.writeText(drawer.getDrawing());
+		showInfo('Copied to clipboard.', 2000);
+	}
+
+
 
 	if (isKeyboardMode) {
 		const isPointerInPainting = pointer.y > 1 && pointer.y < window.h
@@ -138,13 +190,7 @@ export function mainMenu() {
 		},
 		{
 			content: `Export only object`,
-			onClick: () => {
-				navigator.clipboard.writeText(drawer.getDrawing())
-
-				// drawCooldown = 200
-
-				showInfo('Saved object to clipboard.', 2000)
-			}
+			onClick: copyObject
 		},
 		{
 			content: `Export to JSON`,
@@ -170,28 +216,7 @@ export function mainMenu() {
 		},
 		{
 			content: `Load from clipboard`,
-			onClick: () => {
-				navigator.clipboard.readText()
-					.then(data => {
-						console.log(data)
-						object = data.replaceAll('\t', '  ').replaceAll('\r', '')
-
-						if (!object) {
-							showInfo('Clipboard is empty', -1)
-						} else {
-							showInfo('Select a place to paste clipboard.', -1)
-
-							mode = 'paste once'
-						}
-					})
-					.catch(error => {
-						showInfo(`${error}`, -1)
-
-						showInfo('Failed to load object from clipboard.', -1)
-					})
-
-				// drawCooldown = 200
-			}
+			onClick: loadFromClipboard
 		},
 	]
 
