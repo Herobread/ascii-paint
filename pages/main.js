@@ -45,6 +45,15 @@ function showInfo(info_, cooldown = -1) {
 	infoCooldown = cooldown
 }
 
+function copyObject() {
+	navigator.clipboard.writeText(drawer.getDrawing())
+
+	// drawCooldown = 200
+
+	showInfo('Saved object to clipboard.', 2000)
+
+}
+
 export function initMain() {
 	painting = drawer.init(300, 300, 0, 0)
 }
@@ -52,6 +61,21 @@ export function initMain() {
 export function mainMenu() {
 	const pointer = mouse.info()
 	const keyboard = kb.info()
+
+	// Check if CTRL key is pressed
+	if (keyboard.new['c']?.ctrl) {
+		copyObject()
+		return
+	}
+
+	// Handle CTRL+C functionality
+	if (keyboard.new['c']?.ctrl) {
+		// CTRL+C pressed, copy content to clipboard
+		navigator.clipboard.writeText(drawer.getDrawing());
+		showInfo('Copied to clipboard.', 2000);
+	}
+
+
 
 	if (isKeyboardMode) {
 		const isPointerInPainting = pointer.y > 1 && pointer.y < window.h
@@ -138,13 +162,7 @@ export function mainMenu() {
 		},
 		{
 			content: `Export only object`,
-			onClick: () => {
-				navigator.clipboard.writeText(drawer.getDrawing())
-
-				// drawCooldown = 200
-
-				showInfo('Saved object to clipboard.', 2000)
-			}
+			onClick: copyObject
 		},
 		{
 			content: `Export to JSON`,
